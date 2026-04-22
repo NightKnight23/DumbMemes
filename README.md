@@ -7,7 +7,7 @@ I plan to create a fun project to enjoy and learn coding. This project to aimed 
 
 I plan to display as many meme's as possible , which would require me to find the unique facial expression to trigger a specific meme. 
 
-NOTE : 
+NOTE : This project uses mediapipe.tasks library for facemesh instead of .solutions  
 
 
 
