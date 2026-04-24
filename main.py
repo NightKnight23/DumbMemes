@@ -14,10 +14,10 @@ def result_callback(result, output_image,timestamp_ms):
         latest_face = None
         expression = 'No Face Detected'
         return
+    
     latest_face = result.face_landmarks[0]
-        
-        
-        
+    expression = 'Face Detected'
+    
 base_options = python.BaseOptions(model_asset_path='face_landmarker.task')
 options = vision.FaceLandmarkerOptions(
     base_options=base_options,
@@ -40,13 +40,10 @@ with vision.FaceLandmarker.create_from_options(options) as landmarker:
         
         if latest_face:
             h,w,_ = frame.shape
-            
             for point in latest_face:
                 px = int(point.x * w)
                 py = int(point.y * h)
-                
                 cv2.circle(frame, (px, py), 1, (0, 255, 0), -1 )
-                
                 
         if result.face_blendshapes:
             for score in result.face_blendshapes[0]:
