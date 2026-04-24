@@ -7,6 +7,7 @@ from mediapipe.tasks.python import vision
 latest_face = None
 expression = 'None'
 
+meme_path = /Users/allen/Downloads/DumbMemes/MEMES
  #Callback 
 def result_callback(result, output_image,timestamp_ms):
     global latest_face, expression
@@ -17,6 +18,13 @@ def result_callback(result, output_image,timestamp_ms):
     
     latest_face = result.face_landmarks[0]
     expression = 'Face Detected'
+    
+    if result.face_blendshapes:
+        # Create a quick-lookup dictionary of all 52 expressions
+        scores = {s.category_name: s.score for s in result.face_blendshapes[0]}
+        left_wide = scores.get("eyeWideLeft", 0)
+        right_wide = scores.get("eyeWideRight", 0)
+        is_surprised = (left_wide > 0.5 and right_wide > 0.5)
     
 base_options = python.BaseOptions(model_asset_path='face_landmarker.task')
 options = vision.FaceLandmarkerOptions(
@@ -47,10 +55,10 @@ with vision.FaceLandmarker.create_from_options(options) as landmarker:
                 
         if result.face_blendshapes:
             for score in result.face_blendshapes[0]:
-                if score.category_name == "mouthSmile" and score.score > 0.5:
-                    print("You are smiling!")
+                if score.category_name == "is_surprised" and score.score > 0.5:
+                    
             
-        cv2.imshow('Face Tracker', frame)
+        cv2.imshow('Meme Tracker', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
