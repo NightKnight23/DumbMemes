@@ -12,10 +12,12 @@ NOTE : This project uses mediapipe.tasks library for facemesh instead of .soluti
 # HOW IT WORKS
 
 The project will use your webcam in order to retrieve face and using mediapipe .tasks library will track your expressions.
+
 A expression satifying certain threshold will trigger a MEME as a corresponding responce, for instance: 
-   A WIDE OPEN EYES -> SHOCKED DOG
-   WIDE OPEN EYES + MOUTH -> SHOCKED MAN
-   MOUTH COVERED -> Jujutsu Kaisen FED UP EXPRESSION
+
+   1. A WIDE OPEN EYES -> SHOCKED DOG
+   2. WIDE OPEN EYES + MOUTH -> SHOCKED MAN
+   3. MOUTH COVERED -> Jujutsu Kaisen FED UP EXPRESSION
 
 and such many....
 
