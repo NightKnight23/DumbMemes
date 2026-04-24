@@ -1,23 +1,48 @@
 import cv2
 import mediapipe as mp
-import os
+import time
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
 
-face_mesh = mp.solutions.face_mesh.FaceMesh(
-    min_detection_confidence=0.6,
-    min_tracking_confidence= 0.7
-    max_num_face=2
-    refine_landmarks=True
+latest_face = None
+
+ #Callback 
+def result_callback(result, output_image,timestamp_ms):
+    global latest_face
+    if result.face_landmarks:
+        latest_face = result.face_landmarks[0]
+        
+base_options = python.BaseOptions(model_asset_path='face_landmarker.task')
+options = vision.FaceLandmarkerOptions(
+    base_options=base_options,
+    running_mode=vision.RunningMode.LIVE_STREAM,
+    result_callback=result_callback
 )
 
-cam0 = cv2.VideoCapture(0)
-cam1 = cv2.VideoCapture(1)
+# THE LIVE STREAM
+cap = cv2.VideoCapture(0)
 
-#Thresholds 
-open_eye = 0.025
-open_mouth = 0.03
-squinting = 0.018
-tongue_out = 0.035
-iris_look_left=0.4
+with vision.FaceLandmarker.create_from_options(options) as landmarker:
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret: break
 
-def shakespear_meme(face_landmarks_points):
-     
+        timestamp = int(time.time() * 1000)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
+        landmarker.detect_async(mp_image, timestamp)
+        
+        if latest_face:
+            h,w,_ = frame.shape
+            
+            for point in latest_face:
+                px = int(point.x * w)
+                py = int(point.y * h)
+                
+                cv2.circle(frame, (px, py), 1, (0, 255, 0), -1 )
+            
+        cv2.imshow('Face Tracker', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+cap.release()
+cv2.destroyAllWindows()

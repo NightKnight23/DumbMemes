@@ -36,7 +36,7 @@ with vision.FaceLandmarker.create_from_options(options) as landmarker:
         nose = [1] # Nose tip
         eye_right = [362, 263] # Corners of the right eye
         lips = [61, 291] # Corners of the lips
-        lip = [0,11,12]
+        
 
         for idx in eye_left:
             point = face[idx]
@@ -68,13 +68,6 @@ with vision.FaceLandmarker.create_from_options(options) as landmarker:
             
             cv2.circle(raw_image, (px, py), 4, (0, 255, 0), -1 )
         
-        for i in lip:
-            point=face[i]
-            px=int(point.x*w)
-            py=int(point.y*h)
-            
-            cv2.circle(raw_image, (px, py), 4, (0, 255, 30), -1 )
-            
     # Display result
     cv2.imshow("MediaPipe Tasks Test", raw_image)
     cv2.waitKey(0)
