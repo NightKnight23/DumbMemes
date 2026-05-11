@@ -14,21 +14,58 @@ latest_blendshapes = {}
 Memes = {
     'default': 'MEMES/default.jpeg',
     'smiling': 'MEMES/smile.jpeg',
-    'shocked': 'MEMES/shocked_dog.jpeg',
+    'shocked_dog': 'MEMES/shocked_dog.jpeg',
     'speed_shocked': 'MEMES/shocked_speed.jpeg',
-    'speed_smile': 'MEMES/speed_smile.jpeg'
+    'speed_smile': 'MEMES/speed_smile.jpeg',
+    'tongue_out': 'MEMES/Robin.jpeg',
 }
 
 memes_paths = {}
 for name, path in Memes.items():
     img = cv2.imread(path)
     if img is not None:
-        memes_paths[name] = cv2.resize(img, (300, 300))
+        memes_paths[name] = cv2.resize(img, (400, 400))
     else:
         print(f"[warn] could not load meme: {path}")
+        
+#DEFINING EXPRESSION CHECKS
+def is_speed_smile(bs):                             
+    smile = (bs.get('mouthSmileLeft', 0) + bs.get('mouthSmileRight', 0)) / 2
+    blink = (bs.get('eyeLookDownLeft', 0)   + bs.get('eyeLookDownRight', 0))   / 2
+    return smile > 0.4 and blink > 0.7
 
+def is_speed_shocked(bs):  
+    jaw_open =  bs.get('jawOpen', 0)                          
+    eye_wide = (bs.get('eyeWideLeft', 0) + bs.get('eyeWideRight', 0)) / 2
+    return jaw_open < 0.1 and eye_wide > 0.2
 
-#CALLBACK
+def is_shocked(bs):                                  
+    eye_wide = (bs.get('eyeWideLeft', 0) + bs.get('eyeWideRight', 0)) / 2
+    return eye_wide > 0.2
+
+def is_tongue_out(bs):
+    tongue_out = bs.get('tongueOut', 0)
+    mouth_lower = (bs.get('mouthLowerDownLeft',0)+ bs.get('mouthLowerDownRight',0))/2
+    return tongue_out > 0.3 and mouth_lower > 0.3
+
+def is_smiling(bs):                                
+    smile = (bs.get('mouthSmileLeft', 0) + bs.get('mouthSmileRight', 0)) / 2
+    return smile > 0.3
+
+EXPRESSION_CHECKS = [
+    ('speed_smile',   is_speed_smile),   
+    ('speed_shocked', is_speed_shocked),
+    ('shocked_dog',       is_shocked),
+    ('smiling',       is_smiling),
+    ('tongue_out',      is_tongue_out),
+]
+
+def classify_expression(bs):
+    for label, check_fn in EXPRESSION_CHECKS:
+        if check_fn(bs):
+            return label
+    return 'default'
+
 def result_callback(result, output_image, timestamp_ms):
     global latest_face, expression, latest_blendshapes
     
@@ -44,39 +81,7 @@ def result_callback(result, output_image, timestamp_ms):
         bs_list = result.face_blendshapes[0]
         latest_blendshapes = {bs.category_name: bs.score for bs in bs_list}
         expression = classify_expression(latest_blendshapes)
-        
-def classify_expression(bs):
-    
-    eye_wide = (bs.get('eyeWideLeft', 0) + bs.get('eyeWideRight', 0)) / 2
-    jaw_open = bs.get('jawOpen', 0)
-    blink = (bs.get('eyeBlinkLeft', 0) + bs.get('eyeBlinkRight', 0)) / 2
-    tongue= bs.get('tongueOut', 0)
-    
-    def is_smiling(bs):
-        smile  = (bs.get('mouthSmileLeft', 0) + bs.get('mouthSmileRight', 0)) / 2
-        return smile > 0.5 
-    def is_shocked(bs):
-        return eye_wide > 0.5
-    def is_speed_shocked(bs):
-        return eye_wide > 0.5 and jaw_open < 0.3
-    def is_speed_smile(bs):
-        return blink > 0.6 and smile > 0.5
-    def is_tongue_out(bs):
-        return tongue > 0.5
 
-EXPRESSION_CHECKS = [
-    ('smiling',  is_smiling),
-    ('shocked', is_shocked),
-    ('speed_shocked', is_speed_shocked),
-    ('speed_smile', is_speed_smile),
-]
-
-def classify_expression(bs):
-    for label, check_fn in EXPRESSION_CHECKS:
-        if check_fn(bs):
-            return label
-    return 'neutral'
-    
 def overlay_meme(frame, meme_img, x=10, y=10):
     mh, mw = meme_img.shape[:2]
     fh, fw = frame.shape[:2]
@@ -86,8 +91,6 @@ def overlay_meme(frame, meme_img, x=10, y=10):
 
     frame[y:y2, x:x2] = meme_crop
     return frame
-
-
 
 base_options = python.BaseOptions(model_asset_path='face_landmarker.task')
 options = vision.FaceLandmarkerOptions(
@@ -131,7 +134,7 @@ with vision.FaceLandmarker.create_from_options(options) as landmarker:
             for i, (name, score) in enumerate(top):
                 cv2.putText(frame, f'{name}: {score:.2f}',
                             (10, 60 + i * 22),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.55, (180, 180, 180), 1)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 200, 255), 1)
          
         cv2.imshow('DumbMemes', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
