@@ -11,15 +11,24 @@ NOTE : This project uses mediapipe.tasks library for facemesh instead of .soluti
 
 # HOW IT WORKS
 
-The project will use your webcam in order to retrieve face and using mediapipe .tasks library will track your expressions.
+i. The project will use your webcam in order to retrieve face and using mediapipe .tasks library will track your expressions.
 
-A expression satifying certain threshold will trigger a MEME as a corresponding responce, for instance: 
+ii. An expression satifying certain threshold will trigger a MEME as a corresponding responce, for instance: 
 
-   1. A WIDE OPEN EYES -> SHOCKED DOG
-   2. WIDE OPEN EYES + MOUTH -> SHOCKED MAN
+   1. SMILE -> SMILING CAT
+   2. WIDE OPEN EYES + MOUTH COVERED -> SHOCKED SPEED
    3. EYES CLOSE + SMILE -> SMILING SPEED
+   etc...
 
-and many such.....
+# FUTURE WORKS
+
+Some of the expression would require a complex approach to how the expression is to be captured.
+
+An expression that that has a similar facial approach to another might not be reflective, as the pipe would priortize in displaying the other image. Eg - Shocked_Dog image is foreshowed by the Shocked_speed image.
+
+
+
+
 
 
 
