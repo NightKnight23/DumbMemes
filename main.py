@@ -8,9 +8,28 @@ import numpy as np
 
 latest_face = None
 expression = 'None'
+latest_blendshapes = {}
+
+#EXPRESSION's 
+Memes = {
+    'default': 'MEMES/default.jpeg',
+    'smile': 'MEMES/smile.jpeg',
+    'shocked': 'MEMES/shocked_dog.jpeg',
+    'speed_shocked': 'MEMES/shocked_speed.jpeg',
+    'speed_smile': 'MEMES/speed_smile.jpeg'
+}
+
+memes_paths = {}
+for name, path in Memes.items():
+    img = cv2.imread(path)
+    if img is not None:
+        memes[name] = cv2.resize(img, (300, 300))
+    else:
+        print(f"[warn] could not load meme: {path}")
+
 
 #CALLBACK
-def result_callback(result, output_image, timestamp_ms):
+def result_callback(result, blendshapes, timestamp_ms):
     global latest_face, expression
     
     if not result.face_landmarks:
@@ -19,6 +38,7 @@ def result_callback(result, output_image, timestamp_ms):
         return
     
     latest_face = result.face_landmarks[0]
+    latest_blendshapes = result.face_blendshapes[0]
 
 base_options = python.BaseOptions(model_asset_path='face_landmarker.task')
 options = vision.FaceLandmarkerOptions(

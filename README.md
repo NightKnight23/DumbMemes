@@ -17,9 +17,11 @@ A expression satifying certain threshold will trigger a MEME as a corresponding 
 
    1. A WIDE OPEN EYES -> SHOCKED DOG
    2. WIDE OPEN EYES + MOUTH -> SHOCKED MAN
-   3. MOUTH COVERED -> Jujutsu Kaisen FED UP EXPRESSION
+   3. EYES CLOSE + SMILE -> SMILING SPEED
 
-and such many....
+and many such.....
+
+
 
 
 
